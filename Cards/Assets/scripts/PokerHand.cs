@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 
-public class PokarHand
+public class PokerHand
 {
     ///<summary>
     ///ポーカーの役
