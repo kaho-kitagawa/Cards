@@ -144,7 +144,7 @@ public class PokerHand
         if (kinds.Equals(2))
         {
             return Hand.OnePair;
-}
+        }
         #endregion
         return Hand.None;
     }

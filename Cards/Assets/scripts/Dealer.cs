@@ -7,10 +7,8 @@ using UnityEngine.UI;
 public class Dealer : MonoBehaviour
 {
     public const int DealNum = 5;
-    public List<Card> GameDeck = new List<Card>();
 
-    public List<Card> PlayerHand = new List<Card>();
-    public List<Card> EnemyHand = new List<Card>();
+    public List<Card> GameDeck = new List<Card>();
 
     public Image[] PlayerCards = new Image[5];
     public Image[] EnemyCards = new Image[5];
@@ -19,64 +17,79 @@ public class Dealer : MonoBehaviour
 
     public GameResult GameResult;
 
+    public Player Player;
+
+    public CPUPlayer CPUPlayer;
+
     // Start is called before the first frame update
 
     private void Start()
     {
         GameDeck = Deck.ShuffleDeck(Deck.GetDeck());
     }
-    private void Update()
+
+    public void CardDeal()
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        Player.PlayerHand.Clear();
+
+        if (GameDeck.Count < DealNum)
         {
-            CardDeal();
+            GameDeck.Clear();
+            GameDeck = Deck.ShuffleDeck(Deck.GetDeck());
+        }
+
+        for (int i = 0; i < DealNum; i++)
+        {
+            Player.PlayerHand.Add(Deck.GetCard(GameDeck));
+        }
+        CPUPlayer.CPUHand.Clear();
+        if (GameDeck.Count < DealNum)
+        {
+            GameDeck.Clear();
+            GameDeck = Deck.ShuffleDeck(Deck.GetDeck());
+        }
+        for (int i = 0; i < DealNum; i++)
+        {
+            CPUPlayer.CPUHand.Add(Deck.GetCard(GameDeck));
         }
     }
 
-    private void CardDeal()
+
+    public void CardChange(int[] changeNum)
     {
-        PlayerHand.Clear();
-        if (GameDeck.Count < DealNum)
+        for (int i = 0; i < changeNum.Length; i++)
         {
-            GameDeck.Clear();
-            GameDeck = Deck.ShuffleDeck(Deck.GetDeck());
+            if (changeNum[i] != -1)
+            {
+                Player.PlayerHand.RemoveAt(changeNum[i]);
+                Player.PlayerHand.Insert(changeNum[i], Deck.GetCard(GameDeck));
+            }
         }
+    }
 
-
-        for (int i = 0; i < DealNum; i++)
+    public void CardView()
+    {
+        for (int i = 0; i < Player.PlayerHand.Count; i++)
         {
-            PlayerHand.Add(Deck.GetCard(GameDeck));
+            PlayerCards[i].sprite = spriteAtlas.GetSprite
+                ($"Card_{(int)Player.PlayerHand[i].CardSuit * 13 + Player.PlayerHand[i].CardNumber - 1}");
+            Debug.Log($"Player:{Player.PlayerHand[i].CardSuit}:{Player.PlayerHand[i].CardNumber}");
         }
-
-        for (int i = 0; i < PlayerHand.Count; i++)
-        {
-            PlayerCards[i].sprite = spriteAtlas.GetSprite($"Card_{(int)PlayerHand[i].CardSuit * 13 + PlayerHand[i].CardNumber - 1}");
-            Debug.Log($"{PlayerHand[i].CardSuit}:{PlayerHand[i].CardNumber}");
-        }
-        Debug.Log($"Ž©•ª‚ÌŽè–ð‚Í{PokerHand.CardHand(PlayerHand)}");
-        EnemyHand.Clear();
-
-        if (GameDeck.Count < DealNum)
-        {
-            GameDeck.Clear();
-            GameDeck = Deck.ShuffleDeck(Deck.GetDeck());
-        }
-        for (int i = 0; i < DealNum; i++)
-        {
-            EnemyHand.Add(Deck.GetCard(GameDeck));
-
-        }
-        for (int i = 0; i < EnemyHand.Count; i++)
+        for (int i = 0; i < CPUPlayer.CPUHand.Count; i++)
         {
             EnemyCards[i].sprite = spriteAtlas.GetSprite
-                ($"Card_{(int)EnemyHand[i].CardSuit * 13 + EnemyHand[i].CardNumber - 1}");
-            Debug.Log($"{EnemyHand[i].CardSuit}:{EnemyHand[i].CardNumber}");
-
+                ($"Card_{(int)CPUPlayer.CPUHand[i].CardSuit * 13 + CPUPlayer.CPUHand[i].CardNumber - 1}");
+            Debug.Log($"{CPUPlayer.CPUHand[i].CardSuit}:{CPUPlayer.CPUHand[i].CardNumber}");
         }
-        Debug.Log($"‘ŠŽè‚ÌŽè–ð‚Í{PokerHand.CardHand(EnemyHand)}");
-        GameResult.GameResultTextView(PokerHand.CardHand(EnemyHand) < PokerHand.CardHand(PlayerHand));
+    }
+    public void GameJudge()
+    {
+        Debug.Log($"Ž©•ª‚ÌŽè–ð‚Í{PokerHand.CardHand(Player.PlayerHand)}");
+        Debug.Log($"‘ŠŽè‚ÌŽè–ð‚Í{PokerHand.CardHand(CPUPlayer.CPUHand)}");
+        GameResult.GameResultTextView(PokerHand.CardHand(CPUPlayer.CPUHand) < PokerHand.CardHand(Player.PlayerHand));
     }
 }
+
 
 
 
